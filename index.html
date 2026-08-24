@@ -856,7 +856,7 @@
             }
 
             // Example Sentence
-            document.getElementById('exampleSentence').innerText = item.ex ? `✦ ${item.ex}` : '✦ Örnek cümle hazırlanıyor.';
+            document.getElementById('exampleSentence').innerText = (item.ex || item.example) ? `✦ ${item.ex || item.example}` : '✦ Örnek cümle hazırlanıyor.';
             document.getElementById('exampleTranslation').innerText = item.exTr ? `(${item.exTr})` : '';
 
             // Update Progress text & bar
