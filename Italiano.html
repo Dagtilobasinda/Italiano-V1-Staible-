@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Italiano - İtalyanca Kelimeler & Fiiller</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            bg: '#FDFBF7',
+                            card: '#FFFDF9',
+                            cardBack: '#FFF3E4',
+                            accent: '#D97706',
+                            primary: '#C2410C',
+                            dark: '#27221F',
+                            muted: '#78716C'
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['Playfair Display', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #F8F5F0;
+            color: #27221F;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+        }
+
+        /* Perspective for Flip Effect */
+        .card-perspective {
+            perspective: 1000px;
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+
+        .card-inner.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 1.5rem;
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            height: 6px;
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F1ECE4;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D6C7B2;
+            border-radius: 10px;
+        }
+
+        /* Soft Glow Shadows */
+        .soft-shadow {
+            box-shadow: 0 10px 30px -5px rgba(184, 134, 71, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.03);
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- TOP NAVBAR -->
+    <header class="w-full bg-[#FAF6F0] border-b border-[#EFE7DC] px-6 py-4 sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="resetFilters()">
+                <i class="fa-solid fa-bars text-xl text-stone-700"></i>
+                <span class="font-serif italic font-bold text-2xl text-[#C2410C]">Italiano</span>
+            </div>
+            <div id="topCounterBadge" class="bg-[#EFE7DC] text-stone-700 font-medium px-4 py-1.5 rounded-full text-sm">
+                Kelimeler · <span id="totalBadgeCount">0</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-grow max-w-3xl w-full mx-auto px-4 py-6 flex flex-col items-center">
+
+        <!-- TITLE BLOCK -->
+        <div class="text-center mb-6">
+            <h1 id="pageMainTitle" class="font-serif text-3xl md:text-4xl font-bold text-stone-800 tracking-tight">
+                İtalyanca <span class="italic text-[#C2410C]">Kelimeler</span>
+            </h1>
+            <p id="pageSubTitle" class="text-stone-500 text-sm md:text-base mt-1">
+                <span id="totalWordCount">0</span> kelime · <span id="totalCategoryCount">0</span> kategori · örnek cümleler
+            </p>
+        </div>
+
+        <!-- STATS BAR -->
+        <div class="flex items-center justify-center gap-3 mb-5">
+            <span class="bg-[#F1ECE4] text-stone-700 text-xs font-semibold px-3 py-1.5 rounded-full">
+                Toplam: <strong id="statTotal" class="text-[#C2410C]">0</strong>
+            </span>
+            <span class="bg-emerald-50 text-emerald-700 border border-emerald-200/60 text-xs font-semibold px-3 py-1.5 rounded-full">
+                Doğru: <strong id="statCorrect">0</strong>
+            </span>
+            <span class="bg-rose-50 text-rose-700 border border-rose-200/60 text-xs font-semibold px-3 py-1.5 rounded-full">
+                Yanlış: <strong id="statWrong">0</strong>
+            </span>
+        </div>
+
+        <!-- CATEGORIES (SCROLLABLE PILLS) -->
+        <div class="w-full overflow-x-auto pb-2 mb-4 flex items-center gap-2 no-scrollbar" id="categoryContainer">
+            <!-- Dynamic Category Buttons -->
+        </div>
+
+        <!-- SEARCH BAR -->
+        <div class="w-full mb-4 relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-stone-400"></i>
+            <input 
+                type="text" 
+                id="searchInput"
+                placeholder="Kelime ara... (it/tr veya örnek cümle)" 
+                class="w-full bg-white border border-[#EBE3D5] rounded-full py-2.5 pl-11 pr-4 text-sm text-stone-800 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-600 transition soft-shadow"
+            >
+        </div>
+
+        <!-- PROGRESS INDICATOR -->
+        <div class="w-full flex items-center justify-between text-xs text-stone-400 mb-2 px-1">
+            <div class="w-full bg-[#EFE7DC] h-1.5 rounded-full overflow-hidden mr-3">
+                <div id="progressBar" class="bg-[#C2410C] h-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+            <span id="cardIndexText" class="whitespace-nowrap font-medium text-stone-500">1 / 0</span>
+        </div>
+
+        <!-- FLASHCARD AREA -->
+        <div class="w-full card-perspective h-[360px] md:h-[380px] my-2 cursor-pointer" id="cardContainer" onclick="flipCard()">
+            <div id="cardInner" class="card-inner soft-shadow">
+                
+                <!-- CARD FRONT (ITALIAN) -->
+                <div class="card-front bg-[#FFFDF9] border border-[#EFE7DC] p-8 flex flex-col justify-between items-center text-center">
+                    <div class="w-full flex justify-between items-center">
+                        <span id="frontCategoryBadge" class="bg-[#F6EFE6] text-stone-600 text-xs px-3 py-1 rounded-full font-medium">
+                            Genel
+                        </span>
+                        <button onclick="event.stopPropagation(); speakWord();" title="Seslendir" class="text-stone-400 hover:text-amber-700 transition p-1.5">
+                            <i class="fa-solid fa-volume-high text-lg"></i>
+                        </button>
+                    </div>
+
+                    <div class="my-auto">
+                        <p class="text-xs tracking-widest text-stone-400 uppercase font-semibold mb-2">İTALYANCA</p>
+                        <h2 id="frontItalianWord" class="font-serif text-4xl md:text-5xl font-bold text-stone-900 tracking-tight leading-tight">
+                            Ciao!
+                        </h2>
+                    </div>
+
+                    <div class="w-full flex justify-between items-center text-xs text-stone-400">
+                        <span id="frontIndexBadge">1 / 100</span>
+                        <span class="text-stone-400 hover:text-stone-600 font-medium">çevir →</span>
+                    </div>
+                </div>
+
+                <!-- CARD BACK (TURKISH / EXPLANATION) -->
+                <div class="card-back bg-[#FFF6EB] border border-[#F3E3D0] p-6 md:p-8 flex flex-col justify-between items-center text-center">
+                    <div class="w-full flex justify-between items-center">
+                        <span id="backCategoryBadge" class="bg-[#EFE2D2] text-stone-700 text-xs px-3 py-1 rounded-full font-medium">
+                            Kategori
+                        </span>
+                        <span class="text-xs text-amber-800 font-medium tracking-wide uppercase">TÜRKÇE</span>
+                    </div>
+
+                    <div class="my-auto w-full flex flex-col items-center justify-center">
+                        <!-- Translation Headings -->
+                        <h3 id="backTurkishWord" class="font-serif text-3xl md:text-4xl font-bold text-[#C2410C] mb-1">
+                            Merhaba!
+                        </h3>
+                        <p id="backEnglishWord" class="text-xs md:text-sm text-stone-500 italic mb-3">
+                            Hello! / Goodbye!
+                        </p>
+
+                        <!-- Verb Info Section (Shown only if Verb) -->
+                        <div id="verbInfoBox" class="hidden w-full my-2 pt-2 border-t border-amber-200/60">
+                            <div class="grid grid-cols-2 gap-2 text-center mb-2">
+                                <div class="bg-amber-100/50 p-1.5 rounded-lg">
+                                    <span class="block text-[10px] text-stone-500 uppercase font-bold tracking-wider">PRESENTE</span>
+                                    <strong id="verbPresente" class="text-sm text-amber-900 font-semibold">-</strong>
+                                </div>
+                                <div class="bg-amber-100/50 p-1.5 rounded-lg">
+                                    <span class="block text-[10px] text-stone-500 uppercase font-bold tracking-wider">PARTICIPIO</span>
+                                    <strong id="verbParticipio" class="text-sm text-amber-900 font-semibold">-</strong>
+                                </div>
+                            </div>
+                            <span id="verbAuxBadge" class="inline-block bg-teal-100 text-teal-800 text-[11px] font-medium px-2.5 py-0.5 rounded-full mb-1">
+                                aux: avere
+                            </span>
+                        </div>
+
+                        <!-- Example Sentence Box -->
+                        <div id="exampleBox" class="w-full bg-[#F7EAD9]/80 rounded-xl p-3 text-xs md:text-sm text-stone-700 border border-[#EDDBC6]">
+                            <p id="exampleSentence" class="italic font-serif text-stone-800">
+                                ✦ Ciao Marco, come stai?
+                            </p>
+                            <p id="exampleTranslation" class="text-[11px] text-stone-500 mt-1">
+                                (Selam Marco, nasılsın?)
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="w-full flex justify-between items-center text-xs text-stone-400">
+                        <span id="backIndexBadge">#1</span>
+                        <span class="text-amber-800 font-medium">ön yüze dön ←</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ACTION BUTTONS (Bilmedim / Atla / Bildim) -->
+        <div class="w-full grid grid-cols-3 gap-3 my-4">
+            <button onclick="handleAnswer(false)" class="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-2xl py-3 text-sm md:text-base font-semibold flex items-center justify-center gap-1.5 transition active:scale-95">
+                <i class="fa-solid fa-xmark"></i> Bilmedim
+            </button>
+            <button onclick="nextCard()" class="bg-stone-100 hover:bg-stone-200 text-stone-600 border border-stone-200 rounded-2xl py-3 text-sm md:text-base font-semibold flex items-center justify-center gap-1.5 transition active:scale-95">
+                <i class="fa-solid fa-arrow-right"></i> Atla
+            </button>
+            <button onclick="handleAnswer(true)" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-2xl py-3 text-sm md:text-base font-semibold flex items-center justify-center gap-1.5 transition active:scale-95">
+                <i class="fa-solid fa-check"></i> Bildim
+            </button>
+        </div>
+
+        <!-- FOOTER CONTROLS -->
+        <div class="w-full flex flex-wrap items-center justify-center gap-2 mt-2">
+            <button onclick="shuffleDeck()" class="bg-white hover:bg-stone-50 text-stone-700 border border-stone-200 rounded-full px-4 py-2 text-xs font-medium flex items-center gap-1.5 shadow-sm transition">
+                <i class="fa-solid fa-shuffle text-stone-400"></i> Karıştır
+            </button>
+            <button onclick="resetDeck()" class="bg-white hover:bg-stone-50 text-stone-700 border border-stone-200 rounded-full px-4 py-2 text-xs font-medium flex items-center gap-1.5 shadow-sm transition">
+                <i class="fa-solid fa-rotate-left text-stone-400"></i> Başa dön
+            </button>
+            <button onclick="filterWrongOnly()" id="wrongFilterBtn" class="bg-white hover:bg-stone-50 text-stone-700 border border-stone-200 rounded-full px-4 py-2 text-xs font-medium flex items-center gap-1.5 shadow-sm transition">
+                <i class="fa-solid fa-xmark text-rose-500"></i> Yanlışlar
+            </button>
+            <button onclick="toggleExampleFocus()" id="exampleModeBtn" class="bg-white hover:bg-stone-50 text-stone-700 border border-stone-200 rounded-full px-4 py-2 text-xs font-medium flex items-center gap-1.5 shadow-sm transition">
+                <i class="fa-solid fa-comment text-amber-500"></i> Örnek modu
+            </button>
+        </div>
+
+    </main>
+
+    <!-- DATA & LOGIC -->
+    <script>
+        // WORD DATABASE FROM USER LIST
+        const rawDatabase = [
+            // Daily & General Expressions
+            { it: "Vieni?", tr: "Geliyor musun?", en: "Are you coming?", cat: "Günlük İfadeler", ex: "Vieni alla festa stasera?", exTr: "Bu akşam partiye geliyor musun?" },
+            { it: "Calcio", tr: "Futbol", en: "Soccer", cat: "Spor & Hobiler", ex: "Amo giocare a calcio il fine settimana.", exTr: "Hafta sonları futbol oynamayı seviyorum." },
+            { it: "In questo momento", tr: "Şu anda", en: "Right now", cat: "Zaman", ex: "In questo momento sto studiando l'italiano.", exTr: "Şu anda İtalyanca çalışıyorum." },
+            { it: "Dopo", tr: "Sonra", en: "After", cat: "Zaman", ex: "Ci vediamo dopo la lezione.", exTr: "Dersten sonra görüşürüz." },
+            { it: "Sempre", tr: "Her zaman", en: "Always", cat: "Zaman", ex: "Lui arriva sempre in orario.", exTr: "O her zaman zamanında gelir." },
+            { it: "Stasera", tr: "Bu akşam", en: "Tonight", cat: "Zaman", ex: "Cosa fai stasera?", exTr: "Bu akşam ne yapıyorsun?" },
+            { it: "Oggetti", tr: "Eşyalar / Nesneler", en: "Things", cat: "Genel", ex: "Ci sono molti oggetti sul tavolo.", exTr: "Masanın üzerinde bir sürü eşya var." },
+            { it: "Affollato/a / la folla", tr: "Kalabalık / Kalabalık", en: "Crowded / The crowd", cat: "Sıfatlar", ex: "Il centro commerciale è molto affollato.", exTr: "Alışveriş merkezi çok kalabalık." },
+            { it: "Dietro", tr: "Arkasında", en: "Behind", cat: "Yer & Yön", ex: "La macchina è dietro il palazzo.", exTr: "Araba binanın arkasındadır." },
+            { it: "Palazzo", tr: "Bina / Saray", en: "Building", cat: "Ev & Şehir", ex: "Abito in un bel palazzo nel centro.", exTr: "Merkezde güzel bir binada yaşıyorum." },
+            { it: "Solito", tr: "Genellikle / Alışılmış", en: "Usually", cat: "Zaman", ex: "Di solito prendo il caffè al bar.", exTr: "Genellikle kafede kahve içerim." },
+            { it: "Quando?", tr: "Ne zaman?", en: "When?", cat: "Soru Kalıpları", ex: "Quando parti per Roma?", exTr: "Roma'ya ne zaman yola çıkıyorsun?" },
+            { it: "Allora", tr: "Öyleyse / Yani", en: "So", cat: "Bağlaçlar", ex: "Allora, ci vediamo domani!", exTr: "Öyleyse yarın görüşürüz!" },
+            { it: "Poi", tr: "Sonra / Ardından", en: "Then", cat: "Zaman", ex: "Mangiamo e poi usciamo.", exTr: "Yemek yiyip sonra dışarı çıkarız." },
+            { it: "Destra", tr: "Sağ", en: "Right", cat: "Yer & Yön", ex: "Gira a destra al semaforo.", exTr: "Işıklardan sağa dön." },
+            { it: "Impegnata", tr: "Meşgul (Kıl)", en: "Busy", cat: "Sıfatlar", ex: "Oggi sono molto impegnata.", exTr: "Bugün çok meşgulüm." },
+            { it: "Non vedo l’ora di…", tr: "Sabırsızlanıyorum / İple çekiyorum", en: "I cannot wait to…", cat: "Günlük İfadeler", ex: "Non vedo l'ora di andare in vacanza!", exTr: "Tatile gitmek için sabırsızlanıyorum!" },
+            { it: "Io sarò a…", tr: "…'da olacağım", en: "I will be at…", cat: "Günlük İfadeler", ex: "Io sarò a casa verso le otto.", exTr: "Saat sekiz gibi evde olacağım." },
+            { it: "Presto", tr: "Yakında / Erkek", en: "Soon", cat: "Zaman", ex: "Tornerò molto presto.", exTr: "Çok yakında döneceğim." },
+            { it: "Dovrei", tr: "Yapmalıyım / Gerekir", en: "Should", cat: "Günlük İfadeler", ex: "Dovrei studiare di più.", exTr: "Daha fazla çalışmalıyım." },
+            { it: "Certo", tr: "Tabii ki / Kesinlikle", en: "Sure", cat: "Günlük İfadeler", ex: "Certo, ti aiuto io!", exTr: "Tabii ki, sana ben yardım ederim!" },
+            { it: "Forte", tr: "Güçlü / Güçlü ses", en: "Strong", cat: "Sıfatlar", ex: "Marco è un ragazzo molto forte.", exTr: "Marco çok güçlü bir çocuktur." },
+            { it: "Speranza", tr: "Umut", en: "Hope", cat: "Soyut Kavramlar", ex: "Non perdere mai la speranza.", exTr: "Umutsuzluğa asla kapılma." },
+            { it: "Perdere", tr: "Kaybetmek", en: "To lose", cat: "Fiiller", isVerb: true, presente: "perdo", participio: "perso", aux: "avere", ex: "Non voglio perdere la chiave.", exTr: "Anahtarı kaybetmek istemiyorum." },
+            { it: "Corto", tr: "Kısa", en: "Short", cat: "Sıfatlar", ex: "Questo vestito è troppo corto.", exTr: "Bu elbise çok kısa." },
+            { it: "Sbagliato", tr: "Yanlış", en: "Wrong", cat: "Sıfatlar", ex: "Hai preso il bus sbagliato.", exTr: "Yanlış otobüse bindin." },
+            { it: "Le vacanze", tr: "Tatil", en: "The vacation", cat: "Seyahat", ex: "Le vacanze estive sono meravigliose.", exTr: "Yaz tatilleri harikadır." },
+            { it: "Quest’estate", tr: "Bu yaz", en: "This summer", cat: "Zaman", ex: "Quest'estate andrò in Italia.", exTr: "Bu yaz İtalya'ya gideceğim." },
+            { it: "L’orgoglio", tr: "Gurur", en: "Pride", cat: "Soyut Kavramlar", ex: "L'orgoglio a volte non aiuta.", exTr: "Gurur bazen fayda sağlamaz." },
+            { it: "Meglio", tr: "Daha iyi", en: "Better", cat: "Sıfatlar", ex: "Oggi sto molto meglio.", exTr: "Bugün çok daha iyiyim." },
+            { it: "Cresciuto", tr: "Büyümüş / Yetişmiş", en: "Grown up", cat: "Sıfatlar", ex: "Sei cresciuto tantissimo!", exTr: "Çok büyümüşsün!" },
+            { it: "Ancora di più", tr: "Daha da fazla", en: "Even more", cat: "Günlük İfadeler", ex: "Ti amo ancora di più.", exTr: "Seni daha da çok seviyorum." },
+            { it: "Competenze / Abilità", tr: "Beceriler / Yetenekler", en: "Skills", cat: "İş & Eğitim", ex: "Ho sviluppato nuove competenze.", exTr: "Yeni beceriler geliştirdim." },
+            { it: "Conoscere", tr: "Tanımak / Bilmek", en: "Knowledge / Know", cat: "Fiiller", isVerb: true, presente: "conosco", participio: "conosciuto", aux: "avere", ex: "Voglio conoscere la tua famiglia.", exTr: "Aileni tanımak istiyorum." },
+            { it: "Motivazione", tr: "Motivasyon", en: "Motivation", cat: "İş & Eğitim", ex: "Ho bisogno di motivazione per studiare.", exTr: "Çalışmak için motivasyona ihtiyacım var." },
+            { it: "Inside / All'interno", tr: "İçinde / İç kısımda", en: "Inside", cat: "Yer & Yön", ex: "All'interno del museo fa fresco.", exTr: "Müzenin içinde hava serin." },
+            { it: "Apprendimento", tr: "Öğrenme / Öğrenim", en: "Learn", cat: "İş & Eğitim", ex: "L'apprendimento delle lingue richiede tempo.", exTr: "Dil öğrenimi zaman gerektirir." },
+            { it: "Mi aiuta", tr: "Bana yardım ediyor", en: "Helps me", cat: "Günlük İfadeler", ex: "Questa applicazione mi aiuta molto.", exTr: "Bu uygulama bana çok yardımcı oluyor." },
+            { it: "Posto", tr: "Yer / Mekan", en: "Place", cat: "Genel", ex: "Questo è un bel posto per mangiare.", exTr: "Burası yemek yemek için güzel bir yer." },
+            { it: "Modo", tr: "Yol / Biçim / Tarz", en: "Way", cat: "Genel", ex: "C'è un altro modo per farlo.", exTr: "Bunu yapmanın başka bir yolu var." },
+            { it: "Inoltre", tr: "Ayrıca / Ayrıca belirtmek gerekirse", en: "Furthermore", cat: "Bağlaçlar", ex: "Inoltre, parliamo la stessa lingua.", exTr: "Ayrıca aynı dili konuşuyoruz." },
+            { it: "Soprattutto", tr: "Özellikle", en: "Especially", cat: "Bağlaçlar", ex: "Amo la frutta, soprattutto le fragole.", exTr: "Meyveleri severim, özellikle çileği." },
+            { it: "Domanda", tr: "Soru", en: "Question", cat: "İletişim", ex: "Ho una domanda per te.", exTr: "Sana bir sorum var." },
+            { it: "Parola", tr: "Kelime / Söz", en: "Word", cat: "Genel", ex: "Non conosco questa parola.", exTr: "Bu kelimeyi bilmiyorum." },
+            { it: "Tipo", tr: "Tür / Tip", en: "Type", cat: "Genel", ex: "Che tipo di musica ascolti?", exTr: "Ne tür müzik dinlersin?" },
+            { it: "Bread / Pane", tr: "Ekmek", en: "Bread", cat: "Yiyecek & İçecek", ex: "Mancano il pane e il latte.", exTr: "Ekmek ve süt eksik." },
+            { it: "Condividere", tr: "Paylaşmak", en: "To share", cat: "Fiiller", isVerb: true, presente: "condivido", participio: "condiviso", aux: "avere", ex: "Amo condividere il cibo con gli amici.", exTr: "Yemeği arkadaşlarımla paylaşmayı severim." },
+            { it: "Non ho capito", tr: "Anlamadım", en: "Did not understand", cat: "Günlük İfadeler", ex: "Scusa, non ho capito bene.", exTr: "Üzgünüm, tam anlayamadım." },
+            { it: "Rendere", tr: "Hale getirmek / Yapmak", en: "To make", cat: "Fiiller", isVerb: true, presente: "rendo", participio: "reso", aux: "avere", ex: "Questo mi rende molto felice.", exTr: "Bu beni çok mutlu ediyor." },
+            { it: "Credo che", tr: "Sanırım / Düşünüyorum ki", en: "I think / I believe", cat: "Günlük İfadeler", ex: "Credo che sia una buona idea.", exTr: "Bunun iyi bir fikir olduğunu düşünüyorum." },
+            { it: "Soldi", tr: "Para", en: "Money", cat: "Alışveriş & Para", ex: "Non ho abbastanza soldi con me.", exTr: "Yanımda yeterince para yok." },
+            { it: "Pace", tr: "Barış / Huzur", en: "Peace", cat: "Soyut Kavramlar", ex: "Tutti desiderano la pace nel mondo.", exTr: "Herkes dünyada barış istiyor." },
+            { it: "Nuotare", tr: "Yüzmek", en: "To swim", cat: "Fiiller", isVerb: true, presente: "nuoto", participio: "nuotato", aux: "avere", ex: "Mi piace nuotare nel mare pulito.", exTr: "Temiz denizde yüzmeyi severim." },
+            { it: "Passeggiata", tr: "Yürüyüş", en: "To walk", cat: "Aktivite", ex: "Faccio una passeggiata ogni sera.", exTr: "Her akşam bir yürüyüş yaparım." },
+            { it: "Foresta", tr: "Orman", en: "Forest", cat: "Doğa", ex: "Camminare nella foresta è rilassante.", exTr: "Ormanda yürümek rahatlatıcıdır." },
+            { it: "Uccello", tr: "Kuş", en: "Bird", cat: "Doğa", ex: "L'uccello canta sull'albero.", exTr: "Kuş ağaçta ötüyor." },
+            { it: "Strano", tr: "Garip / Tuhaf", en: "Strange", cat: "Sıfatlar", ex: "È un rumore davvero strano.", exTr: "Gerçekten garip bir ses." },
+            { it: "Piccola", tr: "Küçük (Kız/Dişil)", en: "Small", cat: "Sıfatlar", ex: "Abito in una piccola città.", exTr: "Küçük bir şehirde yaşıyorum." },
+            { it: "Diverso", tr: "Farklı / Çeşitli", en: "Different", cat: "Sıfatlar", ex: "Abbiamo opinioni diverse.", exTr: "Farklı fikirlerimiz var." },
+            { it: "Energico", tr: "Enerjik", en: "Energetic", cat: "Sıfatlar", ex: "Oggi mi sento molto energico.", exTr: "Bugün kendimi çok enerjik hissediyorum." },
+            { it: "Il paese", tr: "Ülke / Kasaba", en: "Country / Village", cat: "Yer & Şehir", ex: "L'Italia è un bellissimo paese.", exTr: "İtalya güzel bir ülkedir." },
+            { it: "Approccio", tr: "Yaklaşım", en: "Approach", cat: "Genel", ex: "Questo è un approccio innovativo.", exTr: "Bu yenilikçi bir yaklaşımdır." },
+            { it: "Il campo", tr: "Alan / Saha", en: "Field", cat: "Genel", ex: "Lavora nel campo della medicina.", exTr: "Tıp alanında çalışıyor." },
+            { it: "Il protagonista", tr: "Başkarakter", en: "Protagonist", cat: "Genel", ex: "Chi è il protagonista del film?", exTr: "Filmin başkarakteri kim?" },
+            { it: "La pratica", tr: "Pratik / Uygulama", en: "Practice", cat: "Eğitim", ex: "La pratica rende perfetti.", exTr: "Pratik mükemmelleştirir." },
+            { it: "L'esperienza clinica", tr: "Klinik Deneyim", en: "Clinical Experience", cat: "Sağlık & İş", ex: "Ha anni di esperienza clinica.", exTr: "Yıllarca klinik deneyimi var." },
+
+            // Places & Directions
+            { it: "La fermata", tr: "Durak", en: "Bus stop", cat: "Yer & Yön", ex: "La fermata dell'autobus è vicina.", exTr: "Otobüs durağı yakındır." },
+            { it: "La stazione", tr: "İstasyon", en: "Station", cat: "Yer & Yön", ex: "Andiamo alla stazione dei treni.", exTr: "Tren istasyonuna gidiyoruz." },
+            { it: "Il centro", tr: "Merkez", en: "The center", cat: "Yer & Yön", ex: "Ci vediamo in centro.", exTr: "Merkezde buluşalım." },
+            { it: "Il semaforo", tr: "Trafik ışığı", en: "Traffic light", cat: "Yer & Yön", ex: "Fermati al semaforo rosso.", exTr: "Kırmızı ışıkta dur." },
+            { it: "Dritto", tr: "Düz / İleri", en: "Straight ahead", cat: "Yer & Yön", ex: "Vai dritto per duecento metri.", exTr: "Ikiyüz metre düz git." },
+            { it: "Sempre dritto", tr: "Dümdüz", en: "Always straight", cat: "Yer & Yön", ex: "Continua sempre dritto.", exTr: "Dümdüz devam et." },
+            { it: "A destra", tr: "Sağa / Sağda", en: "To the right", cat: "Yer & Yön", ex: "La farmacia è a destra.", exTr: "Eczane sağdadır." },
+            { it: "A sinistra", tr: "Sola / Solda", en: "To the left", cat: "Yer & Yön", ex: "Gira a sinistra dopo il parco.", exTr: "Parktan sonra sola dön." },
+            { it: "Davanti a", tr: "Önünde", en: "In front of", cat: "Yer & Yön", ex: "Ti aspetto davanti al bar.", exTr: "Seni kafenin önünde bekliyorum." },
+            { it: "Vicino a", tr: "Yakınında", en: "Near to", cat: "Yer & Yön", ex: "La scuola è vicino alla chiesa.", exTr: "Okul kilisenin yakınındadır." },
+            { it: "Abbastanza", tr: "Oldukça / Yeterince", en: "Enough / Quite", cat: "Sıfatlar", ex: "Questo appartamento è abbastanza grande.", exTr: "Bu daire oldukça büyük." },
+            { it: "Un vicino / una vicina", tr: "Komşu", en: "Neighbor", cat: "İnsanlar", ex: "Il mio vicino è molto gentile.", exTr: "Komşum çok naziktir." },
+            { it: "Una conversazione", tr: "Sohbet / Konuşma", en: "Conversation", cat: "İletişim", ex: "Abbiamo avuto una bella conversazione.", exTr: "Güzel bir sohbet ettik." },
+            { it: "Una risposta", tr: "Cevap", en: "Answer", cat: "İletişim", ex: "Aspetto una risposta da te.", exTr: "Senden bir cevap bekliyorum." },
+            { it: "Un messaggio", tr: "Mesaj", en: "Message", cat: "İletişim", ex: "Mandami un messaggio quando arrivi.", exTr: "Vardığında bana mesaj at." },
+            { it: "Un appuntamento", tr: "Buluşma / Randevu", en: "Appointment", cat: "Günlük Yaşam", ex: "Ho un appuntamento dal medico.", exTr: "Doktorda randevum var." },
+            { it: "Un invito", tr: "Davet", en: "Invitation", cat: "Günlük Yaşam", ex: "Grazie per l'invito!", exTr: "Davet için teşekkürler!" },
+            { it: "Un consiglio", tr: "Tavsiye", en: "Advice", cat: "İletişim", ex: "Ti do un buon consiglio.", exTr: "Sana iyi bir tavsiye vereyim." },
+            { it: "Una soluzione", tr: "Çözüm", en: "Solution", cat: "Genel", ex: "Troveremo sicuramente una soluzione.", exTr: "Kesinlikle bir çözüm bulacağız." },
+
+            // Food & Food items
+            { it: "La carne", tr: "Et", en: "The meat", cat: "Yiyecek & İçecek", ex: "Non mangio la carne rossa.", exTr: "Kırmızı et yemiyorum." },
+            { it: "Il pesce", tr: "Balık", en: "The fish", cat: "Yiyecek & İçecek", ex: "Il pesce fresco è buonissimo.", exTr: "Taze balık çok lezzetlidir." },
+            { it: "La verdura", tr: "Sebze", en: "The vegetable", cat: "Yiyecek & İçecek", ex: "Mangio molta verdura di stagione.", exTr: "Bolca mevsim sebzesi yerim." },
+            { it: "La frutta", tr: "Meyve", en: "The fruit", cat: "Yiyecek & İçecek", ex: "La frutta fa bene alla salute.", exTr: "Meyve sağlığa iyidir." },
+            { it: "La pasta", tr: "Makarna", en: "The pasta", cat: "Yiyecek & İçecek", ex: "Cucino la pasta al pomodoro.", exTr: "Domatesli makarna pişiriyorum." },
+            { it: "La pizza", tr: "Pizza", en: "The pizza", cat: "Yiyecek & İçecek", ex: "Ordiniamo una pizza Margherita.", exTr: "Bir Margherita pizza sipariş edelim." },
+            { it: "Il panino", tr: "Sandviç", en: "The sandwich", cat: "Yiyecek & İçecek", ex: "Prendo un panino con prosciutto.", exTr: "Jambonlu bir sandviç alıyorum." },
+            { it: "La mela", tr: "Elma", en: "The apple", cat: "Yiyecek & İçecek", ex: "Una mela al giorno toglie il medico di torno.", exTr: "Elma giren eve doktor girmez." },
+            { it: "Il pollo", tr: "Tavuk", en: "The chicken", cat: "Yiyecek & İçecek", ex: "Stasera cucino il pollo al forno.", exTr: "Bu akşam fırında tavuk pişiriyorum." },
+            { it: "Il riso", tr: "Pirinç / Pilav", en: "The rice", cat: "Yiyecek & İçecek", ex: "Il riso ai funghi è il mio preferito.", exTr: "Mantarlı pilav en sevdiğimdir." },
+            { it: "Il latte", tr: "Süt", en: "The milk", cat: "Yiyecek & İçecek", ex: "Bevo un bicchiere di latte caldo.", exTr: "Bir bardak sıcak süt içiyorum." },
+            { it: "L'acqua", tr: "Su", en: "The water", cat: "Yiyecek & İçecek", ex: "Vorrei una bottiglia d'acqua naturale.", exTr: "Bir şişe durgun su rica ediyorum." },
+            { it: "Il caffè", tr: "Kahve", en: "The coffee", cat: "Yiyecek & İçecek", ex: "Prendiamo un caffè insieme?", exTr: "Birlikte bir kahve içelim mi?" },
+            { it: "Lo zucchero", tr: "Şeker", en: "The sugar", cat: "Yiyecek & İçecek", ex: "Vuoi lo zucchero nel caffè?", exTr: "Kahvene şeker ister misin?" },
+            { it: "Il sale", tr: "Tuz", en: "The salt", cat: "Yiyecek & İçecek", ex: "Manca un po' di sale nella minestra.", exTr: "Çorbada biraz tuz eksik." },
+            { it: "Il pepe", tr: "Karabiber", en: "The pepper", cat: "Yiyecek & İçecek", ex: "Aggiungi un pizzico di pepe.", exTr: "Bir tutam karabiber ekle." },
+            { it: "Il dolce", tr: "Tatlı", en: "The sweet / dessert", cat: "Yiyecek & İçecek", ex: "Vuoi ordinare un dolce?", exTr: "Tatlı sipariş etmek ister misin?" },
+            { it: "La salsiccia", tr: "Sosis / Sucuk", en: "The sausage", cat: "Yiyecek & İçecek", ex: "La salsiccia alla griglia è saporita.", exTr: "Izgara sosis çok lezzetlidir." },
+            { it: "La cipolla", tr: "Soğan", en: "The onion", cat: "Yiyecek & İçecek", ex: "Taglio la cipolla per il sugo.", exTr: "Sosu için soğanı doğruyorum." },
+            { it: "Le fragole", tr: "Çilekler", en: "The strawberries", cat: "Yiyecek & İçecek", ex: "Le fragole con la panna sono ottime.", exTr: "Kremalı çilekler mükemmeldir." },
+            { it: "Il burro", tr: "Tereyağı", en: "Butter", cat: "Yiyecek & İçecek", ex: "Metto il burro sul pane tostato.", exTr: "Kızarmış ekmeğin üzerine tereyağı sürüyorum." },
+            { it: "Il formaggio", tr: "Peynir", en: "The cheese", cat: "Yiyecek & İçecek", ex: "Il formaggio italiano è famoso nel mondo.", exTr: "İtalyan peyniri dünyaca ünlüdür." },
+            { it: "L'uovo", tr: "Yumurta", en: "The egg", cat: "Yiyecek & İçecek", ex: "Mangio un uovo sodo a colazione.", exTr: "Kahvaltıda bir haşlanmış yumurta yerim." },
+            { it: "Il miele", tr: "Bal", en: "The honey", cat: "Yiyecek & İçecek", ex: "Il tè con il miele fa bene alla gola.", exTr: "Ballı çay boğaza iyi gelir." },
+            { it: "La marmellata", tr: "Reçel", en: "Jam", cat: "Yiyecek & İçecek", ex: "Spalmo la marmellata sulle fette biscottate.", exTr: "Petimekslerin üzerine reçel sürüyorum." },
+            { it: "L'aglio", tr: "Sarımsak", en: "The garlic", cat: "Yiyecek & İçecek", ex: "Un po' d'aglio dà un buon sapore.", exTr: "Biraz sarımsak güzel lezzet verir." },
+            { it: "La carota", tr: "Havuç", en: "The carrot", cat: "Yiyecek & İçecek", ex: "La carota fa bene alla vista.", exTr: "Havuç görmeye iyidir." },
+            { it: "La banana", tr: "Muz", en: "The banana", cat: "Yiyecek & İçecek", ex: "Mangio una banana prima di allenarmi.", exTr: "Antrenmandan önce bir muz yerim." },
+            { it: "L'arancia", tr: "Portakal", en: "The orange", cat: "Yiyecek & İçecek", ex: "Bevo una spremuta d'arancia fresca.", exTr: "Taze sıkılmış portakal suyu içiyorum." },
+            { it: "Il limone", tr: "Limon", en: "The lemon", cat: "Yiyecek & İçecek", ex: "Aggiungi un po' di limone sull'insalata.", exTr: "Salatanın üzerine biraz limon ekle." },
+            { it: "Il gelato", tr: "Dondurma", en: "The ice cream", cat: "Yiyecek & İçecek", ex: "Prendiamo un gelato al cioccolato!", exTr: "Çikolatalı bir dondurma alalım!" },
+            { it: "Il piatto", tr: "Tabak", en: "The plate", cat: "Mutfak Eşyaları", ex: "Il piatto è molto caldo, attenzione!", exTr: "Tabak çok sıcak, dikkat et!" },
+            { it: "La forchetta", tr: "Çatal", en: "The fork", cat: "Mutfak Eşyaları", ex: "Manca la forchetta sul tavolo.", exTr: "Masada çatal eksik." },
+            { it: "Il coltello", tr: "Bıçak", en: "The knife", cat: "Mutfak Eşyaları", ex: "Usa il coltello per tagliare il pane.", exTr: "Ekmeği kesmek için bıçağı kullan." },
+            { it: "Il cucchiaio", tr: "Kaşık", en: "The spoon", cat: "Mutfak Eşyaları", ex: "Mangio la zuppa con il cucchiaio.", exTr: "Çorbayı kaşıkla içiyorum." },
+            { it: "La pentola", tr: "Tencere", en: "The pot", cat: "Mutfak Eşyaları", ex: "L'acqua bolle nella pentola.", exTr: "Su tencerede kaynıyor." },
+            { it: "Il frigo", tr: "Buzdolabı", en: "The fridge", cat: "Mutfak Eşyaları", ex: "Metti il latte nel frigo.", exTr: "Sütü buzdolabına koy." },
+            { it: "Il forno", tr: "Fırın", en: "The oven", cat: "Mutfak Eşyaları", ex: "La pizza è nel forno.", exTr: "Pizze fırında." },
+            { it: "Il lavello", tr: "Evye / Lavabo", en: "The sink", cat: "Mutfak Eşyaları", ex: "I piatti sporchi sono nel lavello.", exTr: "Kirli tabaklar evyede." },
+            { it: "La caffettiera", tr: "Kahve makinesi / Moka", en: "The coffee maker", cat: "Mutfak Eşyaları", ex: "La caffettiera sul fuoco sta fischiando.", exTr: "Ocaktaki kahve makinesi ötüyor." },
+            { it: "Il bicchiere", tr: "Bardak", en: "The glass", cat: "Mutfak Eşyaları", ex: "Vuoi un bicchiere d'acqua?", exTr: "Bir bardak su ister misin?" },
+
+            // CORE VERBS LIST (Fiiller)
+            { it: "Essere", tr: "Olmak", en: "Be", cat: "Fiiller", isVerb: true, presente: "sono", participio: "stato", aux: "essere", ex: "Io sono uno studente di psicologia.", exTr: "Ben psikoloji öğrencisiyim." },
+            { it: "Avere", tr: "Sahip olmak", en: "Have", cat: "Fiiller", isVerb: true, presente: "ho", participio: "avuto", aux: "avere", ex: "Ho un gatto nero.", exTr: "Siyah bir kedim var." },
+            { it: "Potere", tr: "Yapabilmek / -ebilmek", en: "Can", cat: "Fiiller", isVerb: true, presente: "posso", participio: "potuto", aux: "avere", ex: "Posso entrare?", exTr: "İçeri girebilir miyim?" },
+            { it: "Volere", tr: "İstemek", en: "Want", cat: "Fiiller", isVerb: true, presente: "voglio", participio: "voluto", aux: "avere", ex: "Voglio imparare l'italiano.", exTr: "İtalyanca öğrenmek istiyorum." },
+            { it: "Dovere", tr: "Zorunda olmak / -meli", en: "Must", cat: "Fiiller", isVerb: true, presente: "devo", participio: "dovuto", aux: "avere", ex: "Devo andare a lavorare.", exTr: "İşe gitmek zorundayım." },
+            { it: "Dire", tr: "Söylemek", en: "Say", cat: "Fiiller", isVerb: true, presente: "dico", participio: "detto", aux: "avere", ex: "Dico sempre la verità.", exTr: "Her zaman doğruyu söylerim." },
+            { it: "Fare", tr: "Yapmak", en: "Do / Make", cat: "Fiiller", isVerb: true, presente: "faccio", participio: "fatto", aux: "avere", ex: "Faccio colazione alle sette.", exTr: "Saat yedide kahvaltı yapıyorum." },
+            { it: "Dare", tr: "Vermek", en: "Give", cat: "Fiiller", isVerb: true, presente: "do", participio: "dato", aux: "avere", ex: "Ti do il mio numero.", exTr: "Sana numaramı veriyorum." },
+            { it: "Andare", tr: "Gitmek", en: "Go", cat: "Fiiller", isVerb: true, presente: "vado", participio: "andato", aux: "essere", ex: "Vado a Roma domani.", exTr: "Yarın Roma'ya gidiyorum." },
+            { it: "Venire", tr: "Gelmek", en: "Come", cat: "Fiiller", isVerb: true, presente: "vengo", participio: "venuto", aux: "essere", ex: "Vengo con te al cinema.", exTr: "Seninle sinemaya geliyorum." },
+            { it: "Stare", tr: "Kalmak / Olmak / Durmak", en: "Stay", cat: "Fiiller", isVerb: true, presente: "sto", participio: "stato", aux: "essere", ex: "Come stai? Sto bene!", exTr: "Nasılsın? İyiyim!" },
+            { it: "Vedere", tr: "Görmek", en: "See", cat: "Fiiller", isVerb: true, presente: "vedo", participio: "visto", aux: "avere", ex: "Vedo il mare dalla finestra.", exTr: "Pencereden denizi görüyorum." },
+            { it: "Prendere", tr: "Almak / Binmek", en: "Take", cat: "Fiiller", isVerb: true, presente: "prendo", participio: "preso", aux: "avere", ex: "Prendo un caffè al bar.", exTr: "Kafede bir kahve alıyorum." },
+            { it: "Parlare", tr: "Konuşmak", en: "Speak", cat: "Fiiller", isVerb: true, presente: "parlo", participio: "parlato", aux: "avere", ex: "Parlo un po' di italiano.", exTr: "Biraz İtalyanca konuşuyorum." },
+            { it: "Piacere", tr: "Hoşlanmak / Beğenilmek", en: "Like", cat: "Fiiller", isVerb: true, presente: "mi piace", participio: "piaciuto", aux: "essere", ex: "Mi piace la musica classica.", exTr: "Klasik müzikten hoşlanırım." },
+            { it: "Uscire", tr: "Dışarı çıkmak", en: "Go out", cat: "Fiiller", isVerb: true, presente: "esco", participio: "uscito", aux: "essere", ex: "Esco con gli amici stasera.", exTr: "Bu akşam arkadaşlarımla dışarı çıkıyorum." },
+            { it: "Entrare", tr: "İçeri girmek", en: "Go in", cat: "Fiiller", isVerb: true, presente: "entro", participio: "entrato", aux: "essere", ex: "Entro in casa adesso.", exTr: "Şimdi eve giriyorum." },
+            { it: "Finire", tr: "Bitirmek", en: "Finish", cat: "Fiiller", isVerb: true, presente: "finisco", participio: "finito", aux: "avere", ex: "Finisco il lavoro alle sei.", exTr: "İşi saat altıda bitiriyorum." },
+            { it: "Cominciare", tr: "Başlamak", en: "Begin", cat: "Fiiller", isVerb: true, presente: "comincio", participio: "cominciato", aux: "avere", ex: "Comincio un nuovo corso.", exTr: "Yeni bir kursa başlıyorum." },
+            { it: "Capire", tr: "Anlamak", en: "Understand", cat: "Fiiller", isVerb: true, presente: "capisco", participio: "capito", aux: "avere", ex: "Capisco perfettamente.", exTr: "Tamamen anlıyorum." },
+            { it: "Leggere", tr: "Okumak", en: "Read", cat: "Fiiller", isVerb: true, presente: "leggo", participio: "letto", aux: "avere", ex: "Leggo un libro interessante.", exTr: "İlginç bir kitap okuyorum." },
+            { it: "Provare", tr: "Denemek", en: "Try", cat: "Fiiller", isVerb: true, presente: "provo", participio: "provato", aux: "avere", ex: "Provo a risolvere il problema.", exTr: "Problemi çözmeye çalışıyorum." },
+            { it: "Risolvere", tr: "Çözmek", en: "Solve", cat: "Fiiller", isVerb: true, presente: "risolvo", participio: "risolto", aux: "avere", ex: "Risolvo tutto facilmente.", exTr: "Her şeyi kolayca çözüyorum." },
+            { it: "Approfondire", tr: "Derinleştirmek / Detaylı incelemek", en: "Explore further", cat: "Fiiller", isVerb: true, presente: "approfondo", participio: "approfondito", aux: "avere", ex: "Voglio approfondire l'argomento.", exTr: "Konuyu detaylı incelemek istiyorum." },
+            { it: "Cercare", tr: "Aramak", en: "Search", cat: "Fiiller", isVerb: true, presente: "cerco", participio: "cercato", aux: "avere", ex: "Cerco le mie chiavi.", exTr: "Anahtarlarımı arıyorum." },
+            { it: "Trovare", tr: "Bulmak", en: "Find", cat: "Fiiller", isVerb: true, presente: "trovo", participio: "trovato", aux: "avere", ex: "Non trovo il mio telefono.", exTr: "Telefonumu bulamıyorum." },
+            { it: "Scegliere", tr: "Seçmek", en: "Choose", cat: "Fiiller", isVerb: true, presente: "scelgo", participio: "scelto", aux: "avere", ex: "Scelgo la pizza Margherita.", exTr: "Margherita pizzayı seçiyorum." },
+            { it: "Decidere", tr: "Karar vermek", en: "Decide", cat: "Fiiller", isVerb: true, presente: "decido", participio: "deciso", aux: "avere", ex: "Ho deciso di partire.", exTr: "Ayrılmaya karar verdim." },
+
+            // Clothing
+            { it: "Indossare", tr: "Giymek", en: "To wear", cat: "Giysiler", isVerb: true, presente: "indosso", participio: "indossato", aux: "avere", ex: "Indosso una giacca nera.", exTr: "Siyah bir ceket giyiyorum." },
+            { it: "Comprare", tr: "Satın almak", en: "To buy", cat: "Alışveriş & Para", isVerb: true, presente: "compro", participio: "comprato", aux: "avere", ex: "Compro le scarpe nuove.", exTr: "Yeni ayakkabılar satın alıyorum." },
+            { it: "La maglietta", tr: "T-shirt / Tişört", en: "The t-shirt", cat: "Giysiler", ex: "Metto una maglietta bianca.", exTr: "Beyaz bir tişört giyiyorum." },
+            { it: "I pantaloni", tr: "Pantolon", en: "The pants", cat: "Giysiler", ex: "Questi pantaloni sono comodi.", exTr: "Bu pantolonlar rahattır." },
+            { it: "La camicia", tr: "Gömlek", en: "The shirt", cat: "Giysiler", ex: "Mette una camicia blu.", exTr: "Mavi bir gömlek giyiyor." },
+            { it: "La gonna", tr: "Etek", en: "The skirt", cat: "Giysiler", ex: "Una gonna elegante per la festa.", exTr: "Parti için şık bir etek." },
+            { it: "Le scarpe", tr: "Ayakkabılar", en: "The shoes", cat: "Giysiler", ex: "Scarpe sportive da ginnastica.", exTr: "Spor ayakkabılar." },
+            { it: "Il cappello", tr: "Şapka", en: "The hat", cat: "Giysiler", ex: "Porto un cappello d'estate.", exTr: "Yazın şapka takarım." },
+            { it: "La sciarpa", tr: "Atkı / Şal", en: "The scarf", cat: "Giysiler", ex: "Una sciarpa calda d'inverno.", exTr: "Kışın sıcak bir atkı." },
+            { it: "La cravatta", tr: "Kravat", en: "The tie", cat: "Giysiler", ex: "Mette la cravatta per il lavoro.", exTr: "İş için kravat takıyor." },
+
+            // Professions
+            { it: "Il medico / La medica", tr: "Doktor", en: "The doctor", cat: "Meslekler", ex: "Il medico visita il paziente.", exTr: "Doktor hastayı muayene ediyor." },
+            { it: "L'infermiere / L'infermiera", tr: "Hemşire", en: "The nurse", cat: "Meslekler", ex: "L'infermiera è molto gentile.", exTr: "Hemşire çok naziktir." },
+            { it: "L'insegnante", tr: "Öğretmen", en: "The teacher", cat: "Meslekler", ex: "L'insegnante spiega la lezione.", exTr: "Öğretmen dersi anlatıyor." },
+            { it: "L'avvocato", tr: "Avukat", en: "The lawyer", cat: "Meslekler", ex: "L'avvocato lavora in tribunale.", exTr: "Avukat adliyede çalışıyor." },
+            { it: "Il cameriere / La cameriera", tr: "Garson", en: "The waiter", cat: "Meslekler", ex: "Il cameriere porta il menu.", exTr: "Garson menüyü getiriyor." },
+            { it: "Il cuoco / La cuoca", tr: "Aşçı", en: "The chef", cat: "Meslekler", ex: "Il cuoco prepara la cena.", exTr: "Aşçı akşam yemeğini hazırlıyor." },
+
+            // Home & Objects
+            { it: "La cucina", tr: "Mutfak", en: "The kitchen", cat: "Ev & Eşyalar", ex: "La cucina è pulita e luminosa.", exTr: "Mutfak temiz ve aydınlıktır." },
+            { it: "La camera da letto", tr: "Yatak odası", en: "The bedroom", cat: "Ev & Eşyalar", ex: "Dormo nella camera da letto.", exTr: "Yatak odasında uyuyorum." },
+            { it: "Il bagno", tr: "Banyo", en: "The bathroom", cat: "Ev & Eşyalar", ex: "Dov'è il bagno, per favore?", exTr: "Banyo nerede, lütfen?" },
+            { it: "Il letto", tr: "Yatak", en: "The bed", cat: "Ev & Eşyalar", ex: "Il letto è molto comodo.", exTr: "Yatak çok rahattır." },
+            { it: "La porta", tr: "Kapı", en: "The door", cat: "Ev & Eşyalar", ex: "Chiudi la porta, per favore.", exTr: "Kapıyı kapat, lütfen." },
+            { it: "La finestra", tr: "Pencere", en: "The window", cat: "Ev & Eşyalar", ex: "Apro la finestra per far entrare aria.", exTr: "Hava girsin diye pencereyi açıyorum." },
+
+            // Time & Daily Routine Connectors
+            { it: "Svegliarsi", tr: "Uyanmak", en: "To wake up", cat: "Fiiller", isVerb: true, presente: "mi sveglio", participio: "svegliato", aux: "essere", ex: "Mi sveglio alle sette ogni mattina.", exTr: "Her sabah saat yedide uyanırım." },
+            { it: "Alzarsi", tr: "Yataktan kalkmak", en: "Get out of bed", cat: "Fiiller", isVerb: true, presente: "mi alzo", participio: "alzato", aux: "essere", ex: "Mi alzo subito dopo la sveglia.", exTr: "Alarimdan hemen sonra kalkarım." },
+            { it: "Fare colazione", tr: "Kahvaltı yapmak", en: "Have breakfast", cat: "Aktivite", ex: "Faccio colazione con caffè e biscotti.", exTr: "Kahve ve bisküvi ile kahvaltı yaparım." },
+            { it: "Pranzare", tr: "Öğle yemeği yemek", en: "Have lunch", cat: "Fiiller", isVerb: true, presente: "pranzo", participio: "pranzato", aux: "avere", ex: "Pranzo alle una con i colleghi.", exTr: "Meslektaşlarımla saat birde öğle yemeği yerim." },
+            { it: "Cenare", tr: "Akşam yemeği yemek", en: "Have dinner", cat: "Fiiller", isVerb: true, presente: "ceno", participio: "cenato", aux: "avere", ex: "Ceniamo in famiglia stasera.", exTr: "Bu akşam ailece akşam yemeği yiyoruz." },
+            { it: "Perché", tr: "Çünkü / Neden?", en: "Because / Why?", cat: "Bağlaçlar", ex: "Studio l'italiano perché mi piace.", exTr: "İtalyanca çalışıyorum çünkü seviyorum." },
+            { it: "Per questo", tr: "Bu yüzden", en: "For this reason", cat: "Bağlaçlar", ex: "Sono stanco, per questo vado a letto.", exTr: "Yorgunum, bu yüzden yatmaya gidiyorum." },
+            { it: "Quindi", tr: "Dolayısıyla / Bu yüzden", en: "So / Therefore", cat: "Bağlaçlar", ex: "Piove, quindi prendo l'ombrello.", exTr: "Yağmur yağıyor, dolayısıyla şemsiyeyi alıyorum." },
+            { it: "Secondo me", tr: "Bence", en: "In my opinion", cat: "Günlük İfadeler", ex: "Secondo me è una grande opportunità.", exTr: "Bence bu büyük bir fırsat." },
+
+            // Restaurant & City
+            { it: "Il conto", tr: "Hesap", en: "The bill", cat: "Restoran & Kafe", ex: "Il conto, per favore!", exTr: "Hesap, lütfen!" },
+            { it: "Economico", tr: "Ucuz / Hesaplı", en: "Cheap", cat: "Alışveriş & Para", ex: "Questo ristorante è molto economico.", exTr: "Bu restoran çok ucuz." },
+            { it: "Costoso", tr: "Pahalı", en: "Expensive", cat: "Alışveriş & Para", ex: "Quel vestito è troppo costoso.", exTr: "O elbise çok pahalı." }
+        ];
+
+        // STATE MANAGEMENT
+        let currentDeck = [];
+        let currentIndex = 0;
+        let activeCategory = "Tümü";
+        let isFlipped = false;
+        let exampleOnlyMode = false;
+        let wrongOnlyMode = false;
+
+        // Local Storage for stats & wrong words
+        let masteredIds = JSON.parse(localStorage.getItem('it_mastered') || '[]');
+        let wrongIds = JSON.parse(localStorage.getItem('it_wrong') || '[]');
+
+        // INITIALIZATION
+        window.addEventListener('DOMContentLoaded', () => {
+            setupCategories();
+            filterDeck();
+            setupSearch();
+            updateStats();
+        });
+
+        function setupCategories() {
+            const categories = ["Tümü", "Fiiller", "Günlük İfadeler", "Yiyecek & İçecek", "Yer & Yön", "Giysiler", "Meslekler", "Ev & Eşyalar", "Bağlaçlar", "Sıfatlar"];
+            const container = document.getElementById('categoryContainer');
+            container.innerHTML = categories.map(cat => `
+                <button 
+                    onclick="selectCategory('${cat}')" 
+                    id="catBtn_${cat.replace(/\s+/g, '')}"
+                    class="category-btn whitespace-nowrap text-xs font-semibold px-4 py-2 rounded-full border transition duration-200 ${
+                        cat === "Tümü" 
+                        ? "bg-[#D97706] text-white border-[#D97706] shadow-sm" 
+                        : "bg-white text-stone-600 border-stone-200 hover:bg-stone-50"
+                    }"
+                >
+                    ${cat} (${countCat(cat)})
+                </button>
+            `).join('');
+
+            document.getElementById('totalBadgeCount').innerText = rawDatabase.length;
+            document.getElementById('totalWordCount').innerText = rawDatabase.length;
+            document.getElementById('totalCategoryCount').innerText = categories.length - 1;
+        }
+
+        function countCat(cat) {
+            if (cat === "Tümü") return rawDatabase.length;
+            return rawDatabase.filter(w => w.cat === cat || (cat === "Fiiller" && w.isVerb)).length;
+        }
+
+        function selectCategory(cat) {
+            activeCategory = cat;
+            wrongOnlyMode = false;
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.className = "category-btn whitespace-nowrap text-xs font-semibold px-4 py-2 rounded-full border transition duration-200 bg-white text-stone-600 border-stone-200 hover:bg-stone-50";
+            });
+            const activeBtn = document.getElementById(`catBtn_${cat.replace(/\s+/g, '')}`);
+            if (activeBtn) {
+                activeBtn.className = "category-btn whitespace-nowrap text-xs font-semibold px-4 py-2 rounded-full border transition duration-200 bg-[#D97706] text-white border-[#D97706] shadow-sm";
+            }
+
+            // Update Titles
+            if (cat === "Fiiller") {
+                document.getElementById('pageMainTitle').innerHTML = `İtalyanca <span class="italic text-[#C2410C]">Fiiller</span>`;
+                document.getElementById('pageSubTitle').innerText = `${countCat('Fiiller')} fiil · presente · participio · ausiliare`;
+            } else {
+                document.getElementById('pageMainTitle').innerHTML = `İtalyanca <span class="italic text-[#C2410C]">Kelimeler</span>`;
+                document.getElementById('pageSubTitle').innerText = `${rawDatabase.length} kelime · 10 kategori · örnek cümleler`;
+            }
+
+            filterDeck();
+        }
+
+        function filterDeck() {
+            let list = rawDatabase;
+            
+            if (wrongOnlyMode) {
+                list = list.filter(w => wrongIds.includes(w.it));
+            } else if (activeCategory !== "Tümü") {
+                if (activeCategory === "Fiiller") {
+                    list = list.filter(w => w.isVerb || w.cat === "Fiiller");
+                } else {
+                    list = list.filter(w => w.cat === activeCategory);
+                }
+            }
+
+            const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
+            if (searchVal) {
+                list = list.filter(w => 
+                    w.it.toLowerCase().includes(searchVal) || 
+                    w.tr.toLowerCase().includes(searchVal) ||
+                    (w.ex && w.ex.toLowerCase().includes(searchVal))
+                );
+            }
+
+            currentDeck = list;
+            currentIndex = 0;
+            renderCard();
+        }
+
+        function renderCard() {
+            isFlipped = false;
+            document.getElementById('cardInner').classList.remove('flipped');
+
+            if (currentDeck.length === 0) {
+                document.getElementById('frontItalianWord').innerText = "Sonuç Bulunamadı";
+                document.getElementById('backTurkishWord').innerText = "Aranan kriterde kelime yok";
+                document.getElementById('cardIndexText').innerText = "0 / 0";
+                document.getElementById('progressBar').style.width = "0%";
+                return;
+            }
+
+            const item = currentDeck[currentIndex];
+
+            // FRONT
+            document.getElementById('frontCategoryBadge').innerText = item.cat || "Genel";
+            document.getElementById('frontItalianWord').innerText = item.it;
+            document.getElementById('frontIndexBadge').innerText = `${currentIndex + 1} / ${currentDeck.length}`;
+
+            // BACK
+            document.getElementById('backCategoryBadge').innerText = item.cat || "Genel";
+            document.getElementById('backTurkishWord').innerText = item.tr;
+            document.getElementById('backEnglishWord').innerText = item.en ? `GB ${item.en}` : '';
+            document.getElementById('backIndexBadge').innerText = `#${currentIndex + 1}`;
+
+            // Verb Specific rendering
+            const verbBox = document.getElementById('verbInfoBox');
+            if (item.isVerb) {
+                verbBox.classList.remove('hidden');
+                document.getElementById('verbPresente').innerText = item.presente || '-';
+                document.getElementById('verbParticipio').innerText = item.participio || '-';
+                document.getElementById('verbAuxBadge').innerText = `aux: ${item.aux || 'avere'}`;
+            } else {
+                verbBox.classList.add('hidden');
+            }
+
+            // Example Sentence
+            document.getElementById('exampleSentence').innerText = item.ex ? `✦ ${item.ex}` : '✦ Örnek cümle hazırlanıyor.';
+            document.getElementById('exampleTranslation').innerText = item.exTr ? `(${item.exTr})` : '';
+
+            // Update Progress text & bar
+            document.getElementById('cardIndexText').innerText = `${currentIndex + 1} / ${currentDeck.length}`;
+            const pct = Math.round(((currentIndex + 1) / currentDeck.length) * 100);
+            document.getElementById('progressBar').style.width = `${pct}%`;
+        }
+
+        function flipCard() {
+            if (currentDeck.length === 0) return;
+            isFlipped = !isFlipped;
+            const inner = document.getElementById('cardInner');
+            if (isFlipped) {
+                inner.classList.add('flipped');
+            } else {
+                inner.classList.remove('flipped');
+            }
+        }
+
+        function handleAnswer(known) {
+            if (currentDeck.length === 0) return;
+            const item = currentDeck[currentIndex];
+
+            if (known) {
+                if (!masteredIds.includes(item.it)) masteredIds.push(item.it);
+                wrongIds = wrongIds.filter(id => id !== item.it);
+            } else {
+                if (!wrongIds.includes(item.it)) wrongIds.push(item.it);
+                masteredIds = masteredIds.filter(id => id !== item.it);
+            }
+
+            saveLocalStorage();
+            updateStats();
+            nextCard();
+        }
+
+        function nextCard() {
+            if (currentDeck.length === 0) return;
+            if (currentIndex < currentDeck.length - 1) {
+                currentIndex++;
+            } else {
+                currentIndex = 0; // Loop back
+            }
+            renderCard();
+        }
+
+        function shuffleDeck() {
+            for (let i = currentDeck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [currentDeck[i], currentDeck[j]] = [currentDeck[j], currentDeck[i]];
+            }
+            currentIndex = 0;
+            renderCard();
+        }
+
+        function resetDeck() {
+            currentIndex = 0;
+            wrongOnlyMode = false;
+            filterDeck();
+        }
+
+        function filterWrongOnly() {
+            wrongOnlyMode = !wrongOnlyMode;
+            const btn = document.getElementById('wrongFilterBtn');
+            if (wrongOnlyMode) {
+                btn.classList.add('bg-rose-100', 'text-rose-800', 'border-rose-300');
+            } else {
+                btn.classList.remove('bg-rose-100', 'text-rose-800', 'border-rose-300');
+            }
+            filterDeck();
+        }
+
+        function toggleExampleFocus() {
+            exampleOnlyMode = !exampleOnlyMode;
+            const btn = document.getElementById('exampleModeBtn');
+            const exBox = document.getElementById('exampleBox');
+            if (exampleOnlyMode) {
+                btn.classList.add('bg-amber-100', 'text-amber-900', 'border-amber-300');
+                exBox.classList.add('ring-2', 'ring-amber-500/50', 'bg-amber-100/90');
+            } else {
+                btn.classList.remove('bg-amber-100', 'text-amber-900', 'border-amber-300');
+                exBox.classList.remove('ring-2', 'ring-amber-500/50', 'bg-amber-100/90');
+            }
+        }
+
+        function setupSearch() {
+            document.getElementById('searchInput').addEventListener('input', () => {
+                filterDeck();
+            });
+        }
+
+        function updateStats() {
+            document.getElementById('statTotal').innerText = rawDatabase.length;
+            document.getElementById('statCorrect').innerText = masteredIds.length;
+            document.getElementById('statWrong').innerText = wrongIds.length;
+        }
+
+        function saveLocalStorage() {
+            localStorage.setItem('it_mastered', JSON.stringify(masteredIds));
+            localStorage.setItem('it_wrong', JSON.stringify(wrongIds));
+        }
+
+        function resetFilters() {
+            document.getElementById('searchInput').value = "";
+            selectCategory("Tümü");
+        }
+
+        function speakWord() {
+            if (currentDeck.length === 0) return;
+            const word = currentDeck[currentIndex].it;
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(word);
+                utterance.lang = 'it-IT';
+                speechSynthesis.speak(utterance);
+            }
+        }
+    </script>
+</body>
+</html>
