@@ -268,9 +268,92 @@
             <button onclick="toggleExampleFocus()" id="exampleModeBtn" class="bg-white hover:bg-stone-50 text-stone-700 border border-stone-200 rounded-full px-4 py-2 text-xs font-medium flex items-center gap-1.5 shadow-sm transition">
                 <i class="fa-solid fa-comment text-amber-500"></i> Örnek modu
             </button>
+                        <button onclick="openAddCardModal()" class="bg-[#C2410C] hover:bg-[#a8380a] text-white border border-[#C2410C] rounded-full px-4 py-2 text-xs font-medium flex items-center gap-1.5 shadow-sm transition">
+                <i class="fa-solid fa-plus"></i> Yeni Kart
+            </button>
+            <button onclick="openBackupModal()" class="bg-white hover:bg-stone-50 text-stone-700 border border-stone-200 rounded-full px-4 py-2 text-xs font-medium flex items-center gap-1.5 shadow-sm transition">
+                <i class="fa-solid fa-cloud-arrow-up text-stone-400"></i> Yedekle / Aktar
+            </button>
         </div>
 
     </main>
+        <!-- YENİ KART EKLEME MODALI -->
+    <div id="addCardModal" class="hidden fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-serif text-xl font-bold text-stone-800">Yeni Kart Ekle</h3>
+                <button onclick="closeAddCardModal()" class="text-stone-400 hover:text-stone-700"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <label class="block text-xs font-semibold text-stone-500 mb-1">İtalyanca kelime *</label>
+            <input type="text" id="newCardIt" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm mb-3" placeholder="örn. Coraggio">
+
+            <label class="block text-xs font-semibold text-stone-500 mb-1">Türkçe çeviri *</label>
+            <input type="text" id="newCardTr" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm mb-3" placeholder="örn. Cesaret">
+
+            <label class="block text-xs font-semibold text-stone-500 mb-1">Kategori *</label>
+            <select id="newCardCategorySelect" onchange="onCategorySelectChange()" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm mb-2"></select>
+            <input type="text" id="newCategoryInput" class="hidden w-full border border-stone-200 rounded-lg px-3 py-2 text-sm mb-3" placeholder="Yeni kategori adı yaz">
+
+            <label class="block text-xs font-semibold text-stone-500 mb-1">Örnek cümle (İtalyanca)</label>
+            <input type="text" id="newCardEx" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm mb-3" placeholder="örn. Ci vuole coraggio.">
+
+            <label class="block text-xs font-semibold text-stone-500 mb-1">Cümle çevirisi (Türkçe)</label>
+            <input type="text" id="newCardExTr" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm mb-3" placeholder="örn. Cesaret gerekiyor.">
+
+            <label class="flex items-center gap-2 text-sm text-stone-600 mb-3">
+                <input type="checkbox" id="newCardIsVerb" onchange="toggleVerbFields()"> Bu bir fiil
+            </label>
+
+            <div id="verbFieldsBox" class="hidden grid grid-cols-2 gap-2 mb-3">
+                <div>
+                    <label class="block text-xs font-semibold text-stone-500 mb-1">Presente</label>
+                    <input type="text" id="newCardPresente" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm" placeholder="örn. vado">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-stone-500 mb-1">Participio</label>
+                    <input type="text" id="newCardParticipio" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm" placeholder="örn. andato">
+                </div>
+                <div class="col-span-2">
+                    <label class="block text-xs font-semibold text-stone-500 mb-1">Ausiliare</label>
+                    <select id="newCardAux" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm">
+                        <option value="avere">avere</option>
+                        <option value="essere">essere</option>
+                    </select>
+                </div>
+            </div>
+
+            <button onclick="saveNewCard()" class="w-full bg-[#C2410C] hover:bg-[#a8380a] text-white rounded-xl py-2.5 text-sm font-semibold transition">
+                Kaydet
+            </button>
+        </div>
+    </div>
+
+    <!-- YEDEKLEME / AKTARMA MODALI -->
+    <div id="backupModal" class="hidden fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-serif text-xl font-bold text-stone-800">Yedekle / Aktar</h3>
+                <button onclick="closeBackupModal()" class="text-stone-400 hover:text-stone-700"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <p class="text-xs text-stone-500 mb-2">Bu kutu, senin eklediğin tüm kartları içerir. Kopyalayıp başka bir cihazda "İçe Aktar" kutusuna yapıştırabilirsin.</p>
+            <textarea id="exportTextArea" readonly class="w-full h-32 border border-stone-200 rounded-lg px-3 py-2 text-xs font-mono mb-2"></textarea>
+            <button onclick="copyExportText()" class="w-full bg-stone-700 hover:bg-stone-800 text-white rounded-xl py-2 text-sm font-semibold mb-5 transition">
+                <i class="fa-solid fa-copy"></i> Kopyala
+            </button>
+
+            <p class="text-xs text-stone-500 mb-2">Başka bir cihazdan kopyaladığın metni buraya yapıştır:</p>
+            <textarea id="importTextArea" class="w-full h-32 border border-stone-200 rounded-lg px-3 py-2 text-xs font-mono mb-2" placeholder="Buraya yapıştır..."></textarea>
+            <button onclick="importUserWords()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl py-2 text-sm font-semibold mb-3 transition">
+                <i class="fa-solid fa-file-import"></i> İçe Aktar
+            </button>
+
+            <button onclick="clearUserWords()" class="w-full text-rose-600 hover:bg-rose-50 border border-rose-200 rounded-xl py-2 text-xs font-medium transition">
+                Kendi eklediğim tüm kartları sil
+            </button>
+        </div>
+    </div>
 
     <!-- DATA & LOGIC -->
     <script>
@@ -888,6 +971,13 @@
         let masteredIds = JSON.parse(localStorage.getItem('it_mastered') || '[]');
         let wrongIds = JSON.parse(localStorage.getItem('it_wrong') || '[]');
 
+        // Kullanıcının kendi eklediği kelimeler — cihaza özel, localStorage'da tutulur
+        let userWords = JSON.parse(localStorage.getItem('it_user_words') || '[]');
+
+        function getFullDatabase() {
+            return rawDatabase.concat(userWords);
+        }
+
         // INITIALIZATION
         window.addEventListener('DOMContentLoaded', () => {
             setupCategories();
@@ -896,15 +986,26 @@
             updateStats();
         });
 
+        function getAllCategories() {
+            const db = getFullDatabase();
+            const preferredOrder = ["Fiiller", "Günlük İfadeler", "Yiyecek & İçecek", "Yer & Yön", "Giysiler", "Meslekler", "Ev & Eşyalar", "Bağlaçlar", "Sıfatlar"];
+            const foundCats = new Set();
+            db.forEach(w => { if (w.cat) foundCats.add(w.cat); });
+            foundCats.add("Fiiller"); // isVerb bazlı sanal kategori, hep listede kalsın
+            const ordered = preferredOrder.filter(c => foundCats.has(c));
+            const rest = [...foundCats].filter(c => !preferredOrder.includes(c)).sort((a, b) => a.localeCompare('tr'));
+            return ["Tümü", ...ordered, ...rest];
+        }
+
         function setupCategories() {
-            const categories = ["Tümü", "Zaman", "Fiiller", "Günlük İfadeler", "Psikoloji", "Yiyecek & İçecek", "Yer & Yön", "Giysiler", "Meslekler", "Ev & Eşyalar", "Bağlaçlar", "Sıfatlar", "Eğitim", "Duygular", "Kişilik", "Arte", "Soyut Kelimeler", "Sağlık", "Hava Durumu", "Doğa", "İlişkiler"];
+            const categories = getAllCategories();
             const container = document.getElementById('categoryContainer');
             container.innerHTML = categories.map(cat => `
                 <button 
                     onclick="selectCategory('${cat}')" 
                     id="catBtn_${cat.replace(/\s+/g, '')}"
                     class="category-btn whitespace-nowrap text-xs font-semibold px-4 py-2 rounded-full border transition duration-200 ${
-                        cat === "Tümü" 
+                        cat === activeCategory 
                         ? "bg-[#D97706] text-white border-[#D97706] shadow-sm" 
                         : "bg-white text-stone-600 border-stone-200 hover:bg-stone-50"
                     }"
@@ -913,14 +1014,16 @@
                 </button>
             `).join('');
 
-            document.getElementById('totalBadgeCount').innerText = rawDatabase.length;
-            document.getElementById('totalWordCount').innerText = rawDatabase.length;
+            const db = getFullDatabase();
+            document.getElementById('totalBadgeCount').innerText = db.length;
+            document.getElementById('totalWordCount').innerText = db.length;
             document.getElementById('totalCategoryCount').innerText = categories.length - 1;
         }
 
         function countCat(cat) {
-            if (cat === "Tümü") return rawDatabase.length;
-            return rawDatabase.filter(w => w.cat === cat || (cat === "Fiiller" && w.isVerb)).length;
+            const db = getFullDatabase();
+            if (cat === "Tümü") return db.length;
+            return db.filter(w => w.cat === cat || (cat === "Fiiller" && w.isVerb)).length;
         }
 
         function selectCategory(cat) {
@@ -947,7 +1050,7 @@
         }
 
         function filterDeck() {
-            let list = rawDatabase;
+            let list = getFullDatabase();
             
             if (wrongOnlyMode) {
                 list = list.filter(w => wrongIds.includes(w.it));
@@ -961,10 +1064,11 @@
 
             const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
             if (searchVal) {
-                list = list.filter(w => 
+                                list = list.filter(w => 
                     w.it.toLowerCase().includes(searchVal) || 
                     w.tr.toLowerCase().includes(searchVal) ||
-                    (w.ex && w.ex.toLowerCase().includes(searchVal))
+                    (w.ex && w.ex.toLowerCase().includes(searchVal)) ||
+                    (w.example && w.example.toLowerCase().includes(searchVal))
                 );
             }
 
@@ -1103,7 +1207,7 @@
         }
 
         function updateStats() {
-            document.getElementById('statTotal').innerText = rawDatabase.length;
+            document.getElementById('statTotal').innerText = getFullDatabase().length;
             document.getElementById('statCorrect').innerText = masteredIds.length;
             document.getElementById('statWrong').innerText = wrongIds.length;
         }
@@ -1126,6 +1230,145 @@
                 utterance.lang = 'it-IT';
                 speechSynthesis.speak(utterance);
             }
+        }
+
+        // ============================================
+        // YENİ KART EKLEME
+        // ============================================
+        function openAddCardModal() {
+            const catSelect = document.getElementById('newCardCategorySelect');
+            const cats = getAllCategories().filter(c => c !== "Tümü" && c !== "Fiiller");
+            catSelect.innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join('') + `<option value="__new__">+ Yeni kategori...</option>`;
+            document.getElementById('newCategoryInput').classList.add('hidden');
+            document.getElementById('newCategoryInput').value = '';
+            document.getElementById('newCardIt').value = '';
+            document.getElementById('newCardTr').value = '';
+            document.getElementById('newCardEx').value = '';
+            document.getElementById('newCardExTr').value = '';
+            document.getElementById('newCardIsVerb').checked = false;
+            document.getElementById('verbFieldsBox').classList.add('hidden');
+            document.getElementById('newCardPresente').value = '';
+            document.getElementById('newCardParticipio').value = '';
+            document.getElementById('newCardAux').value = 'avere';
+            document.getElementById('addCardModal').classList.remove('hidden');
+        }
+
+        function closeAddCardModal() {
+            document.getElementById('addCardModal').classList.add('hidden');
+        }
+
+        function onCategorySelectChange() {
+            const val = document.getElementById('newCardCategorySelect').value;
+            const newCatInput = document.getElementById('newCategoryInput');
+            if (val === '__new__') {
+                newCatInput.classList.remove('hidden');
+                newCatInput.focus();
+            } else {
+                newCatInput.classList.add('hidden');
+            }
+        }
+
+        function toggleVerbFields() {
+            const box = document.getElementById('verbFieldsBox');
+            box.classList.toggle('hidden', !document.getElementById('newCardIsVerb').checked);
+        }
+
+        function saveNewCard() {
+            const it = document.getElementById('newCardIt').value.trim();
+            const tr = document.getElementById('newCardTr').value.trim();
+            let cat = document.getElementById('newCardCategorySelect').value;
+            if (cat === '__new__') {
+                cat = document.getElementById('newCategoryInput').value.trim();
+            }
+            const ex = document.getElementById('newCardEx').value.trim();
+            const exTr = document.getElementById('newCardExTr').value.trim();
+            const isVerb = document.getElementById('newCardIsVerb').checked;
+
+            if (!it || !tr || !cat) {
+                alert('Lütfen İtalyanca kelime, Türkçe çeviri ve kategori alanlarını doldur.');
+                return;
+            }
+
+            const newWord = { it, tr, cat };
+            if (ex) newWord.ex = ex;
+            if (exTr) newWord.exTr = exTr;
+            if (isVerb) {
+                newWord.isVerb = true;
+                newWord.presente = document.getElementById('newCardPresente').value.trim();
+                newWord.participio = document.getElementById('newCardParticipio').value.trim();
+                newWord.aux = document.getElementById('newCardAux').value;
+            }
+
+            userWords.push(newWord);
+            localStorage.setItem('it_user_words', JSON.stringify(userWords));
+
+            closeAddCardModal();
+            setupCategories();
+            filterDeck();
+            updateStats();
+        }
+
+        // ============================================
+        // YEDEKLEME / AKTARMA
+        // ============================================
+        function openBackupModal() {
+            document.getElementById('exportTextArea').value = JSON.stringify(userWords, null, 2);
+            document.getElementById('importTextArea').value = '';
+            document.getElementById('backupModal').classList.remove('hidden');
+        }
+
+        function closeBackupModal() {
+            document.getElementById('backupModal').classList.add('hidden');
+        }
+
+        function copyExportText() {
+            const textarea = document.getElementById('exportTextArea');
+            textarea.select();
+            document.execCommand('copy');
+            alert('Kopyalandı! Başka cihazda "İçe Aktar" kutusuna yapıştırabilirsin.');
+        }
+
+        function importUserWords() {
+            const raw = document.getElementById('importTextArea').value.trim();
+            if (!raw) {
+                alert('Yapıştıracak bir şey yok.');
+                return;
+            }
+            let parsed;
+            try {
+                parsed = JSON.parse(raw);
+                if (!Array.isArray(parsed)) throw new Error('Dizi değil');
+            } catch (e) {
+                alert('Geçersiz format. Kopyaladığın metni değiştirmeden yapıştırdığından emin ol.');
+                return;
+            }
+
+            const existingIt = new Set(userWords.map(w => w.it.toLowerCase()));
+            let addedCount = 0;
+            parsed.forEach(w => {
+                if (w && w.it && w.tr && w.cat && !existingIt.has(w.it.toLowerCase())) {
+                    userWords.push(w);
+                    existingIt.add(w.it.toLowerCase());
+                    addedCount++;
+                }
+            });
+
+            localStorage.setItem('it_user_words', JSON.stringify(userWords));
+            setupCategories();
+            filterDeck();
+            updateStats();
+            alert(`${addedCount} yeni kart eklendi.`);
+            openBackupModal();
+        }
+
+        function clearUserWords() {
+            if (!confirm('Kendi eklediğin TÜM kartları silmek istediğine emin misin? Bu işlem geri alınamaz.')) return;
+            userWords = [];
+            localStorage.removeItem('it_user_words');
+            setupCategories();
+            filterDeck();
+            updateStats();
+            openBackupModal();
         }
     </script>
 </body>
